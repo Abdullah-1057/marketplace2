@@ -67,7 +67,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
         order: "desc",
       },
     });
-  const getOurminimumNextBid = async (input) => {
+  const getOurminimumNextBid = async (input: string) => {
     console.log("check point 1");
     try {
       const minimumNextBid =
