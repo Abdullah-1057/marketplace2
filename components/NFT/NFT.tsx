@@ -5,7 +5,7 @@ import {
   useValidEnglishAuctions,
 } from "@thirdweb-dev/react";
 import { NFT } from "@thirdweb-dev/sdk";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   MARKETPLACE_ADDRESS,
   NFT_COLLECTION_ADDRESS,
@@ -23,6 +23,8 @@ export default function NFTComponent({ nft }: Props) {
     "marketplace-v3"
   );
 
+  const [mybidValue, setmyBidValue] = useState<string>();
+
   // 1. Load if the NFT is for direct listing
   const { data: directListing, isLoading: loadingDirect } =
     useValidDirectListings(marketplace, {
@@ -37,9 +39,27 @@ export default function NFTComponent({ nft }: Props) {
       tokenId: nft.metadata.id,
     });
 
+    const getOurminimumNextBid = async (input: string) => {
+      console.log("check point 1");
+      try {
+        const minimumNextBid =
+          await marketplace?.englishAuctions.getMinimumNextBid(input);
+        console.log(minimumNextBid?.displayValue);
+        setmyBidValue(minimumNextBid?.displayValue);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    useEffect(() => {
+      if (auctionListing && auctionListing.length > 0) {
+        getOurminimumNextBid(auctionListing[0].id);
+      }
+    }, [auctionListing]);
+
   return (
     <>
-      <ThirdwebNftMedia metadata={nft.metadata} className={styles.nftImage} />
+      <ThirdwebNftMedia metadata={nft.metadata} className={styles.nftImage} style={{ height: '200px' }}/>
 
       <p className={styles.nftTokenId}>Token ID #{nft.metadata.id}</p>
       <p className={styles.nftName}>{nft.metadata.name}</p>
@@ -62,7 +82,7 @@ export default function NFTComponent({ nft }: Props) {
             <div>
               <p className={styles.nftPriceLabel}>Minimum Bid</p>
               <p className={styles.nftPriceValue}>
-                {`${auctionListing[0]?.minimumBidCurrencyValue.displayValue}
+                {`${mybidValue}
           ${auctionListing[0]?.minimumBidCurrencyValue.symbol}`}
               </p>
             </div>
