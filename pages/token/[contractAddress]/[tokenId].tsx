@@ -6,6 +6,7 @@ import {
   useValidDirectListings,
   useValidEnglishAuctions,
   Web3Button,
+  useAddress,
 } from "@thirdweb-dev/react";
 import React, { useState, useEffect } from "react";
 import Container from "../../../components/Container/Container";
@@ -34,6 +35,7 @@ const [randomColor1, randomColor2] = [randomColor(), randomColor()];
 export default function TokenPage({ nft, contractMetadata }: Props) {
   const [bidValue, setBidValue] = useState<string>();
   const [mybidValue, setmyBidValue] = useState<string>();
+  const address = useAddress();
 
   // Connect to marketplace smart contract
   const { contract: marketplace, isLoading: loadingContract } = useContract(
@@ -389,7 +391,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
               //   </Web3Button>
               // </>
               <>
-                {directListing && directListing[0] ? (
+                {directListing && directListing[0] && nft.owner!=address ? (
                   <>
                     <h3>This is a direct Listing</h3>
                     <br />
@@ -415,7 +417,8 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                       Buy at asking price
                     </Web3Button>
                   </>
-                ) : auctionListing && auctionListing[0] ? (
+                  // 
+                ) : auctionListing && auctionListing[0] && nft.owner!=address ? (
                   <>
                     <h3>This is a Auction Listing</h3>
                     <br />

@@ -16,6 +16,7 @@ export default function Sell() {
   // Load all of the NFTs from the NFT Collection
   const { contract } = useContract(NFT_COLLECTION_ADDRESS);
   const address = useAddress();
+  console.log(address)
   const { data, isLoading } = useOwnedNFTs(contract, address);
 
   const [selectedNft, setSelectedNft] = useState<NFTType>();
@@ -23,6 +24,7 @@ export default function Sell() {
   return (
     <Container maxWidth="lg">
       <h1>Sell NFTs</h1>
+      {console.log(address)}
       {!selectedNft ? (
         <>
           <p>Select which NFT you&rsquo;d like to sell below.</p>
