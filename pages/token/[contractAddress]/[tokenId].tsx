@@ -7,7 +7,7 @@ import {
   useValidEnglishAuctions,
   Web3Button,
 } from "@thirdweb-dev/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "../../../components/Container/Container";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
@@ -33,6 +33,7 @@ const [randomColor1, randomColor2] = [randomColor(), randomColor()];
 
 export default function TokenPage({ nft, contractMetadata }: Props) {
   const [bidValue, setBidValue] = useState<string>();
+  const [mybidValue, setmyBidValue] = useState<string>();
 
   // Connect to marketplace smart contract
   const { contract: marketplace, isLoading: loadingContract } = useContract(
@@ -66,12 +67,23 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
         order: "desc",
       },
     });
+  const getOurminimumNextBid = async (input) => {
+    console.log("check point 1");
+    try {
+      const minimumNextBid =
+        await marketplace?.englishAuctions.getMinimumNextBid(input);
+      console.log(minimumNextBid?.displayValue);
+      setmyBidValue(minimumNextBid?.displayValue);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  async function getOurminimumNextBid(input)
-  {
-    const minimumNextBid = await marketplace?.englishAuctions.getMinimumNextBid(input);
-    console.log(minimumNextBid?.displayValue)
-  }  
+  useEffect(() => {
+    if (auctionListing && auctionListing.length > 0) {
+      getOurminimumNextBid(auctionListing[0].id);
+    }
+  }, [auctionListing]);
   async function createBidOrOffer() {
     let txResult;
     if (!bidValue) {
@@ -108,8 +120,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
       txResult = await marketplace?.englishAuctions.buyoutAuction(
         auctionListing[0].id
       );
-      console.log("helo2")
-    
+      console.log("helo2");
     } else if (directListing?.[0]) {
       txResult = await marketplace?.directListings.buyFromListing(
         directListing[0].id,
@@ -153,7 +164,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
 
               <h3 className={styles.descriptionTitle}>History</h3>
 
-              <div className={styles.traitsContainer}>
+              <div className={styles.traitsContainer}  style={{ marginBottom: '50px' }}>
                 {transferEvents?.map((event, index) => (
                   <div
                     key={event.transaction.transactionHash}
@@ -271,14 +282,10 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                           <p className={styles.label} style={{ marginTop: 12 }}>
                             Bids starting from
                             {/* console.log(await marketplace?.englishAuctions.getMinimumNextBid(auctionListing[0].id)) */}
-
                           </p>
                           {/* {console.log(marketplace?.englishAuctions.getMinimumNextBid(0))} */}
                           <div className={styles.pricingValue}>
-                            {
-                              auctionListing[0]?.minimumBidCurrencyValue
-                                .displayValue
-                            }
+                            {mybidValue}
                             {" " +
                               auctionListing[0]?.minimumBidCurrencyValue.symbol}
                           </div>
@@ -359,8 +366,8 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
               <>
                 {directListing && directListing[0] ? (
                   <>
-                  <h3>This is a direct Listing</h3>
-                  <br />
+                    <h3>This is a direct Listing</h3>
+                    <br />
                     <Web3Button
                       contractAddress={MARKETPLACE_ADDRESS}
                       action={async () => await buyListing()}
@@ -386,7 +393,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                 ) : auctionListing && auctionListing[0] ? (
                   <>
                     <h3>This is a Auction Listing</h3>
-                  <br />
+                    <br />
                     <Web3Button
                       contractAddress={MARKETPLACE_ADDRESS}
                       action={async () => await buyListing()}
@@ -417,39 +424,44 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
 
                     <input
                       className={styles.input}
-                      defaultValue={
-                        auctionListing?.[0]?.minimumBidCurrencyValue
-                          ?.displayValue || 0
-                      }
+                      defaultValue={mybidValue || 0}
                       type="number"
                       step={0.000001}
                       onChange={(e) => {
                         setBidValue(e.target.value);
                       }}
                     />
-
-                    <Web3Button
-                      contractAddress={MARKETPLACE_ADDRESS}
-                      action={async () => await createBidOrOffer()}
-                      className={styles.btn}
-                      onSuccess={() => {
-                        toast(`Bid success!`, {
-                          icon: "✅",
-                          style: toastStyle,
-                          position: "bottom-center",
-                        });
-                      }}
-                      onError={(e) => {
-                        console.log(e);
-                        toast(`Bid failed! Reason: ${e.message}`, {
-                          icon: "❌",
-                          style: toastStyle,
-                          position: "bottom-center",
-                        });
-                      }}
-                    >
-                      Place bid
-                    </Web3Button>
+                    {/* bidValue >= mybidValue &&  */}
+                    {
+                      <Web3Button
+                        contractAddress={MARKETPLACE_ADDRESS}
+                        action={async () => await createBidOrOffer()}
+                        className={styles.btn}
+                        onSuccess={() => {
+                          if (
+                            bidValue !== undefined &&
+                            mybidValue !== undefined &&
+                            bidValue >= mybidValue
+                          ) {
+                            toast(`Bid success!`, {
+                              icon: "✅",
+                              style: toastStyle,
+                              position: "bottom-center",
+                            });
+                          }
+                        }}
+                        onError={(e) => {
+                          console.log(e);
+                          toast(`Bid failed! Reason: ${e.message}`, {
+                            icon: "❌",
+                            style: toastStyle,
+                            position: "bottom-center",
+                          });
+                        }}
+                      >
+                        Place bid
+                      </Web3Button>
+                    }
                   </>
                 ) : (
                   "Unfortunately canot be bought"
