@@ -67,6 +67,11 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
       },
     });
 
+  async function getOurminimumNextBid(input)
+  {
+    const minimumNextBid = await marketplace?.englishAuctions.getMinimumNextBid(input);
+    console.log(minimumNextBid?.displayValue)
+  }  
   async function createBidOrOffer() {
     let txResult;
     if (!bidValue) {
@@ -103,6 +108,8 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
       txResult = await marketplace?.englishAuctions.buyoutAuction(
         auctionListing[0].id
       );
+      console.log("helo2")
+    
     } else if (directListing?.[0]) {
       txResult = await marketplace?.directListings.buyFromListing(
         directListing[0].id,
@@ -260,10 +267,13 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                     <>
                       {auctionListing && auctionListing[0] && (
                         <>
+                          {/* {getOurminimumNextBid(auctionListing[0].id)} */}
                           <p className={styles.label} style={{ marginTop: 12 }}>
                             Bids starting from
-                          </p>
+                            {/* console.log(await marketplace?.englishAuctions.getMinimumNextBid(auctionListing[0].id)) */}
 
+                          </p>
+                          {/* {console.log(marketplace?.englishAuctions.getMinimumNextBid(0))} */}
                           <div className={styles.pricingValue}>
                             {
                               auctionListing[0]?.minimumBidCurrencyValue
@@ -283,68 +293,167 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
             {loadingContract || loadingDirect || loadingAuction ? (
               <Skeleton width="100%" height="164" />
             ) : (
+              // <>
+              //   <Web3Button
+              //     contractAddress={MARKETPLACE_ADDRESS}
+              //     action={async () => await buyListing()}
+              //     className={styles.btn}
+              //     onSuccess={() => {
+              //       toast(`Purchase success!`, {
+              //         icon: "✅",
+              //         style: toastStyle,
+              //         position: "bottom-center",
+              //       });
+              //     }}
+              //     onError={(e) => {
+              //       toast(`Purchase failed! Reason: ${e.message}`, {
+              //         icon: "❌",
+              //         style: toastStyle,
+              //         position: "bottom-center",
+              //       });
+              //     }}
+              //   >
+              //     Buy at asking price
+              //   </Web3Button>
+
+              //   <div className={`${styles.listingTimeContainer} ${styles.or}`}>
+              //     <p className={styles.listingTime}>or</p>
+              //   </div>
+
+              //   <input
+              //     className={styles.input}
+              //     defaultValue={
+              //       auctionListing?.[0]?.minimumBidCurrencyValue
+              //         ?.displayValue || 0
+              //     }
+              //     type="number"
+              //     step={0.000001}
+              //     onChange={(e) => {
+              //       setBidValue(e.target.value);
+              //     }}
+              //   />
+
+              //   <Web3Button
+              //     contractAddress={MARKETPLACE_ADDRESS}
+              //     action={async () => await createBidOrOffer()}
+              //     className={styles.btn}
+              //     onSuccess={() => {
+              //       toast(`Bid success!`, {
+              //         icon: "✅",
+              //         style: toastStyle,
+              //         position: "bottom-center",
+              //       });
+              //     }}
+              //     onError={(e) => {
+              //       console.log(e);
+              //       toast(`Bid failed! Reason: ${e.message}`, {
+              //         icon: "❌",
+              //         style: toastStyle,
+              //         position: "bottom-center",
+              //       });
+              //     }}
+              //   >
+              //     Place bid
+              //   </Web3Button>
+              // </>
               <>
-                <Web3Button
-                  contractAddress={MARKETPLACE_ADDRESS}
-                  action={async () => await buyListing()}
-                  className={styles.btn}
-                  onSuccess={() => {
-                    toast(`Purchase success!`, {
-                      icon: "✅",
-                      style: toastStyle,
-                      position: "bottom-center",
-                    });
-                  }}
-                  onError={(e) => {
-                    toast(`Purchase failed! Reason: ${e.message}`, {
-                      icon: "❌",
-                      style: toastStyle,
-                      position: "bottom-center",
-                    });
-                  }}
-                >
-                  Buy at asking price
-                </Web3Button>
+                {directListing && directListing[0] ? (
+                  <>
+                  <h3>This is a direct Listing</h3>
+                  <br />
+                    <Web3Button
+                      contractAddress={MARKETPLACE_ADDRESS}
+                      action={async () => await buyListing()}
+                      className={styles.btn}
+                      onSuccess={() => {
+                        toast(`Purchase success!`, {
+                          icon: "✅",
+                          style: toastStyle,
+                          position: "bottom-center",
+                        });
+                      }}
+                      onError={(e) => {
+                        toast(`Purchase failed! Reason: ${e.message}`, {
+                          icon: "❌",
+                          style: toastStyle,
+                          position: "bottom-center",
+                        });
+                      }}
+                    >
+                      Buy at asking price
+                    </Web3Button>
+                  </>
+                ) : auctionListing && auctionListing[0] ? (
+                  <>
+                    <h3>This is a Auction Listing</h3>
+                  <br />
+                    <Web3Button
+                      contractAddress={MARKETPLACE_ADDRESS}
+                      action={async () => await buyListing()}
+                      className={styles.btn}
+                      onSuccess={() => {
+                        toast(`Purchase success!`, {
+                          icon: "✅",
+                          style: toastStyle,
+                          position: "bottom-center",
+                        });
+                      }}
+                      onError={(e) => {
+                        toast(`Purchase failed! Reason: ${e.message}`, {
+                          icon: "❌",
+                          style: toastStyle,
+                          position: "bottom-center",
+                        });
+                      }}
+                    >
+                      Buy at asking price
+                    </Web3Button>
 
-                <div className={`${styles.listingTimeContainer} ${styles.or}`}>
-                  <p className={styles.listingTime}>or</p>
-                </div>
+                    <div
+                      className={`${styles.listingTimeContainer} ${styles.or}`}
+                    >
+                      <p className={styles.listingTime}>or</p>
+                    </div>
 
-                <input
-                  className={styles.input}
-                  defaultValue={
-                    auctionListing?.[0]?.minimumBidCurrencyValue
-                      ?.displayValue || 0
-                  }
-                  type="number"
-                  step={0.000001}
-                  onChange={(e) => {
-                    setBidValue(e.target.value);
-                  }}
-                />
+                    <input
+                      className={styles.input}
+                      defaultValue={
+                        auctionListing?.[0]?.minimumBidCurrencyValue
+                          ?.displayValue || 0
+                      }
+                      type="number"
+                      step={0.000001}
+                      onChange={(e) => {
+                        setBidValue(e.target.value);
+                      }}
+                    />
 
-                <Web3Button
-                  contractAddress={MARKETPLACE_ADDRESS}
-                  action={async () => await createBidOrOffer()}
-                  className={styles.btn}
-                  onSuccess={() => {
-                    toast(`Bid success!`, {
-                      icon: "✅",
-                      style: toastStyle,
-                      position: "bottom-center",
-                    });
-                  }}
-                  onError={(e) => {
-                    console.log(e);
-                    toast(`Bid failed! Reason: ${e.message}`, {
-                      icon: "❌",
-                      style: toastStyle,
-                      position: "bottom-center",
-                    });
-                  }}
-                >
-                  Place bid
-                </Web3Button>
+                    <Web3Button
+                      contractAddress={MARKETPLACE_ADDRESS}
+                      action={async () => await createBidOrOffer()}
+                      className={styles.btn}
+                      onSuccess={() => {
+                        toast(`Bid success!`, {
+                          icon: "✅",
+                          style: toastStyle,
+                          position: "bottom-center",
+                        });
+                      }}
+                      onError={(e) => {
+                        console.log(e);
+                        toast(`Bid failed! Reason: ${e.message}`, {
+                          icon: "❌",
+                          style: toastStyle,
+                          position: "bottom-center",
+                        });
+                      }}
+                    >
+                      Place bid
+                    </Web3Button>
+                  </>
+                ) : (
+                  "Unfortunately canot be bought"
+                )}
               </>
             )}
           </div>

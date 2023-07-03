@@ -117,6 +117,84 @@ export default function SaleInfo({ nft }: Props) {
 
   async function handleSubmissionAuction(data: AuctionFormData) {
     await checkAndProvideApproval();
+    if (data.endDate < data.startDate) {
+      console.log("helo1");
+      toast.error("Re enter data, end date sould be greater that start date", {
+        icon: "❌",
+        style: toastStyle,
+        position: "bottom-center",
+      });
+      const txResult = await createAuctionListing({
+          assetContractAddress: data.nftContractAddress,
+          tokenId: 0,
+          buyoutBidAmount: -1,
+          minimumBidAmount: -1,
+          startTimestamp: undefined,
+          endTimestamp: undefined,
+        });
+
+      return txResult;
+    }
+    // const currentDate = new Date();
+    // const startDate = new Date(data.startDate);
+    // if (startDate < currentDate) {
+    //   toast.error("Start date should be greater than today", {
+    //     icon: "❌",
+    //     style: toastStyle,
+    //     position: "bottom-center",
+    //   });
+    //   const txResult = await createAuctionListing({
+    //       assetContractAddress: data.nftContractAddress,
+    //       tokenId: 0,
+    //       buyoutBidAmount: -1,
+    //       minimumBidAmount: -1,
+    //       startTimestamp: undefined,
+    //       endTimestamp: undefined,
+    //     });
+
+    //   return txResult;
+
+    // }
+    const myprice1 = parseFloat(data.buyoutPrice);
+    const myprice2 = parseFloat(data.floorPrice);
+
+    if (myprice1<=0 || myprice2<=0) {
+      toast.error("Input should be greater than 0", {
+        icon: "❌",
+        style: toastStyle,
+        position: "bottom-center",
+      });
+      const txResult = await createAuctionListing({
+          assetContractAddress: data.nftContractAddress,
+          tokenId: 0,
+          buyoutBidAmount: -1,
+          minimumBidAmount: -1,
+          startTimestamp: undefined,
+          endTimestamp: undefined,
+        });
+
+      return txResult;
+    }
+
+    if (myprice1<myprice2) {
+      toast.error("Buyout price must be greater than minimum dib price", {
+        icon: "❌",
+        style: toastStyle,
+        position: "bottom-center",
+      });
+      const txResult = await createAuctionListing({
+          assetContractAddress: data.nftContractAddress,
+          tokenId: 0,
+          buyoutBidAmount: -1,
+          minimumBidAmount: -1,
+          startTimestamp: undefined,
+          endTimestamp: undefined,
+        });
+
+      return txResult;
+    }
+    console.log("hel");
+
     const txResult = await createAuctionListing({
       assetContractAddress: data.nftContractAddress,
       tokenId: data.tokenId,
@@ -131,6 +209,65 @@ export default function SaleInfo({ nft }: Props) {
 
   async function handleSubmissionDirect(data: DirectFormData) {
     await checkAndProvideApproval();
+
+    if (data.endDate < data.startDate) {
+      console.log("helo1");
+      toast.error("Re enter data, end date sould be greater that start date", {
+        icon: "❌",
+        style: toastStyle,
+        position: "bottom-center",
+      });
+      const txResult = await createDirectListing({
+        assetContractAddress: data.nftContractAddress,
+        tokenId: 0,
+        pricePerToken: -1,
+        startTimestamp: undefined,
+        endTimestamp: undefined,
+      });
+
+      return txResult;
+    }
+    // const currentDate = new Date();
+    // const startDate = new Date(data.startDate);
+    // if (startDate < currentDate) {
+    //   toast.error("Start date should be greater than today", {
+    //     icon: "❌",
+    //     style: toastStyle,
+    //     position: "bottom-center",
+    //   });
+    //   const txResult = await createDirectListing({
+    //     assetContractAddress: data.nftContractAddress,
+    //     tokenId: 0,
+    //     pricePerToken: -1,
+    //     startTimestamp: undefined,
+    //     endTimestamp: undefined,
+    //   });
+
+    //   return txResult;
+
+    //   return false;
+    // }
+    const myprice = parseFloat(data.price);
+    console.log(myprice);
+    if (myprice <= 0) {
+      toast.error("Input should be greater than 0", {
+        icon: "❌",
+        style: toastStyle,
+        position: "bottom-center",
+      });
+      const txResult = await createDirectListing({
+        assetContractAddress: data.nftContractAddress,
+        tokenId: 0,
+        pricePerToken: -1,
+        startTimestamp: undefined,
+        endTimestamp: undefined,
+      });
+
+      return txResult;
+    }
+    console.log("hel");
+
+
     const txResult = await createDirectListing({
       assetContractAddress: data.nftContractAddress,
       tokenId: data.tokenId,
