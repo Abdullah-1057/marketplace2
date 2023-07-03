@@ -150,21 +150,40 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
               <h3 className={styles.descriptionTitle}>Traits</h3>
 
               <div className={styles.traitsContainer}>
-                {Object.entries(nft?.metadata?.attributes || {}).map(
-                  ([key, value]) => (
-                    <div className={styles.traitContainer} key={key}>
-                      <p className={styles.traitName}>{key}</p>
-                      <p className={styles.traitValue}>
-                        {value?.toString() || ""}
-                      </p>
-                    </div>
+                {Object.keys(nft?.metadata?.attributes || {}).length > 0 ? (
+                  Object.entries(nft?.metadata?.attributes || {}).map(
+                    ([key, value]) => (
+                      <div className={styles.traitContainer} key={key}>
+                        <p className={styles.traitName}>{key}</p>
+                        <p className={styles.traitValue}>
+                          Name: {value.trait_type?.toString() || ""}
+                          <br />
+                          Value: {value.value?.toString() || ""}
+                        </p>
+                      </div>
+                    )
                   )
+                ) : (
+                  <p>No traits</p>
                 )}
               </div>
+              {/* <div className={styles.traitsContainer}>
+  {Object.entries(nft?.metadata?.attributes || {}).map(([key, value]) => (
+    <div className={styles.traitContainer} key={key}>
+      <p className={styles.traitName}>{key}</p>
+      <p className={styles.traitValue}>
+        {JSON.stringify(value) || ""}
+      </p>
+    </div>
+  ))}
+</div> */}
 
               <h3 className={styles.descriptionTitle}>History</h3>
 
-              <div className={styles.traitsContainer}  style={{ marginBottom: '50px' }}>
+              <div
+                className={styles.traitsContainer}
+                style={{ marginBottom: "50px" }}
+              >
                 {transferEvents?.map((event, index) => (
                   <div
                     key={event.transaction.transactionHash}
